@@ -1,3 +1,3 @@
-# secure_note
+# NoteVault
 
-A new Flutter project.
+A Flutter project.
