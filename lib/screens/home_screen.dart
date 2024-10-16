@@ -1,12 +1,15 @@
 // home_screen.dart
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:secure_note/controllers/home_controller.dart';
 import 'package:secure_note/controllers/note_controller.dart';
 import 'package:secure_note/data/models/note.dart';
 import 'package:secure_note/widgets/NoteWidget.dart';
+
+// add max length to a note card, so notes would not be even in height.
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find<HomeController>();
@@ -16,79 +19,129 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('MOST SECURE NOTES'),
-      ),
       child: SafeArea(
-        child: Container(
-        margin: EdgeInsets.fromLTRB(0, 10.0, 0, 0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              leading: Text(
+                'My Secure Notes',
+                style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+              ),
+              trailing: CircleAvatar(
+                radius: 15,
+                backgroundImage: AssetImage(
+                    'no-image-yet.png'),
+              ),
+              border: Border(
+                bottom: BorderSide(width: 0.0, color: Colors.transparent),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CupertinoSearchTextField(
+                onChanged: (value) {
+                  // UNIMPLEMENTED 
+                },
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Obx(() {
+                  return GridView.builder(
+                    itemCount: controller.notes.length,
+                    // grid config
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // max two columns
+                      crossAxisSpacing: 16.0,
+                      mainAxisSpacing: 16.0,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemBuilder: (context, index) {
+                      final Note note = controller.notes[index];
+                      return NoteCardWidget(note: note);
+                    },
+                  );
+                }),
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              left: MediaQuery.of(context).size.width / 2 - 35,
+              child: Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(35),
+                  color: CupertinoColors.darkBackgroundGray
+                ),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: Icon(
+                    CupertinoIcons.add,
+                    size: 35,
+                  ),
+                  onPressed: () {
+                    Get.toNamed('/create_note');
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NoteCardWidget extends StatelessWidget {
+  final Note note;
+
+  NoteCardWidget({required this.note});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
             color: CupertinoColors.darkBackgroundGray,
-            width: 10.0
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
-        ),
-          child: Stack(
-            children: [
-              Obx(
-                () { return ListView.builder(
-                   itemCount: controller.notes.length,
-                   itemBuilder: (context, index) {
-                     final Note note = controller.notes[index];
-                     final NoteController c = Get.find();
-                     c.notesExpanded[note.id] = RxBool(false);
-                
-                     return NoteWidget(note: note);
-                   });
-               }),
-              
-                // return ListView.builder(
-                //   itemCount: notes.length,
-                //   itemBuilder: (context, index) {
-                //     final note = controller.notes[index];
-                //     return Column(
-                //       children: [
-                //         CupertinoListTile(
-                //           title: Text(
-                //             note.name,
-                //             style: const TextStyle(fontSize: 18.0),
-                //           ),
-                //           subtitle: Text(
-                //             'ID: ${note.id}',
-                //             style: const TextStyle(fontSize: 14.0),
-                //           ),
-                //           onTap: () {
-                //             controller.toggleExpansion(note.id);
-                //           },
-                //         ),
-                //         // if (controller.expandedId.value == note.id)
-                //         if (note.id == controller.expandedId.value)
-                //           ExpansionWidget(content: note.content)
-                //       ],
-                //     );
-                //   },
-                // );
-              Positioned(
-                  left: 120,
-                  right: 120,
-                  bottom: MediaQuery.of(context).size.height / 10,
-                  child: Container(
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(30), color: CupertinoColors.darkBackgroundGray,),
-                      height: MediaQuery.of(context).size.height / 10,
-                      child: Center(
-                        child: CupertinoButton(
-                            child: const Icon(
-                              CupertinoIcons.add,
-                              color: CupertinoColors.white,
-                            ),
-                            onPressed: () {
-                              Get.toNamed('/create_note');
-                            }),
-                      )))
-            ],
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            note.name,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
+          SizedBox(height: 8),
+          // TODO: create preview
+          Text(
+            note.content.length > 50
+                ? note.content.substring(0, 50) + '...'
+                : note.content,
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            "11.22.63", // TODO: handle dates
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

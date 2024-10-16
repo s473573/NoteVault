@@ -25,8 +25,8 @@ class NoteWidget extends StatelessWidget {
           controller.notesExpanded[note.id]?.value = !controller.notesExpanded[note.id]!.value;
           controller.animController.forward();
         },),
-         Text('ID: ${note.id}', style: TextStyle(fontWeight: FontWeight.bold,), textAlign: TextAlign.center,),
-         SizedBox(height: 4.0,),
+         Text('ID: ${note.id}', style: const TextStyle(fontWeight: FontWeight.bold,), textAlign: TextAlign.center,),
+         const SizedBox(height: 4.0,),
          Obx(
           () => AnimatedContainer(
             duration: const Duration(milliseconds: 600),
@@ -38,7 +38,7 @@ class NoteWidget extends StatelessWidget {
                 visible: isExpanded!.isTrue,
                 child: Text(
                     note.content,
-                    style: const TextStyle(color: CupertinoColors.systemGrey4, fontStyle: FontStyle.italic),
+                    style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
               ),
             ),
@@ -90,14 +90,12 @@ class CupertinoCard extends StatelessWidget {
                 child: Text(
                   text,
                   style: const TextStyle(
-                      color: CupertinoColors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600),
                 ),
               ),
               const Icon(
                 CupertinoIcons.doc,
-                color: CupertinoColors.white,
                 size: 25.0,
               )
             ],

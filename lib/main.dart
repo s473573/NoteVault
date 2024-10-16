@@ -1,5 +1,3 @@
-// ignore_for_file: constant_identifier_names
-
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'screens/home_screen.dart';
@@ -18,7 +16,7 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
   
-  static const _app_name = "Secure Note";
+  static const _app_name = "NoteVault";
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +29,18 @@ class MainApp extends StatelessWidget {
         GetPage(name: '/create_note', page: () => CreateNoteScreen()),
       ],
       theme: const CupertinoThemeData(
+        barBackgroundColor: CupertinoColors.black,
         brightness: Brightness.dark,
+        primaryColor: CupertinoColors.activeOrange,
+        textTheme: CupertinoTextThemeData(
+          navTitleTextStyle: TextStyle(
+            color: CupertinoColors.activeOrange,
+            fontFamily: 'SF Pro Display',
+            fontSize: 26,
+            fontWeight: FontWeight.w400),
+          primaryColor: CupertinoColors.activeOrange
+        ),
+        applyThemeToAll: true
       )
     );
   }
