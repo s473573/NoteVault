@@ -8,10 +8,11 @@ void main() {
   runApp(const MainApp());
 }
 
-// add a note
-  // store it somewhere safe
+// add a note DONE
+  // store it somewhere safe DONE +-
   
-// secure a note
+// make different vaults of notes
+// secure each of them with a password
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

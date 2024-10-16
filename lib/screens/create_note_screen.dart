@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:secure_note/controllers/create_note_controller.dart';
 
+// TODO: make saving work without hitting the save button;
+// might get rid of the button alltogether
+
 class CreateNoteScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
@@ -13,7 +16,6 @@ class CreateNoteScreen extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Write a note'),
-        // padding: const EdgeInsetsDirectional.only(bottom: 8.0),
         trailing: Container(
           child: CupertinoButton(
             padding: const EdgeInsets.all(8.0),
@@ -22,11 +24,12 @@ class CreateNoteScreen extends StatelessWidget {
                   nameController.text,
                   contentController.text
                 );
-              Get.back(); // Navigate back after saving
+              Get.back();
             },
-            child: const Text(
-              'Save',
-              style: TextStyle(color: CupertinoColors.systemIndigo, fontSize: 16),),
+            child: Icon(
+              CupertinoIcons.check_mark,
+              size: 24,
+            ),
           ),
         ),
       ),
@@ -44,7 +47,7 @@ class CreateNoteScreen extends StatelessWidget {
                   placeholder: 'Note Name',
                   padding: EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: CupertinoColors.systemIndigo),
+                    border: Border.all(), // do i need this at all?
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
@@ -59,12 +62,12 @@ class CreateNoteScreen extends StatelessWidget {
                   placeholder: 'Type your note here...',
                   padding: EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: CupertinoColors.systemIndigo),
+                    border: Border.all(color: CupertinoTheme.of(context).primaryColor),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.newline,
-                  style: TextStyle(fontSize: 16.0), // Adjust text size as needed
+                  style: TextStyle(fontSize: 16.0),
                   textAlign: TextAlign.start,
                 ),
               ),
