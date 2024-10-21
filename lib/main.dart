@@ -1,11 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:secure_note/screens/vault_screen.dart';
-import 'screens/home_screen.dart';
+
+import 'data/models/vault.dart';
 import 'screens/create_note_screen.dart';
 import 'bindings/app_bindings.dart';
 
-void main() {
+void initDB() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final dir = await getApplicationDocumentsDirectory();
+  Hive.defaultDirectory = dir.path;
+  
+  // registering vault model here
+  Hive.registerAdapter('Vault', Vault.jsonWrapper);
+}
+
+void main() async {
+  initDB();
   runApp(const MainApp());
 }
 

@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+// design a storage solution for all of this
+// encrypt it with a vault key
+
 class VaultScreen extends StatelessWidget {
   final List<String> vaults = ["Work Vault", "Personal Vault", "Ideas Vault"]; // ad-hoc vaults
 
