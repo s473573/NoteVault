@@ -1,20 +1,15 @@
+import 'package:hive/hive.dart';
+
+import 'note.dart';
+
 class Vault {
-  Vault({required this.name, required this.passwordHash});
+  Vault({
+    required this.name,
+    required this.passwordHash,
+    required this.box
+  });
 
   final String name;
   final String passwordHash;
-  
-  static Vault jsonWrapper(dynamic json) {
-    return Vault.fromJson(json as Map<String, dynamic>);
-  }
-
-  factory Vault.fromJson(Map<String, dynamic> json) => Vault(
-    name: json['name'] as String,
-    passwordHash: json['pass'] as String,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'pass': passwordHash,
-  };
+  final Box<Note> box;
 }

@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:secure_note/screens/vault_screen.dart';
 
-import 'data/models/vault.dart';
+import 'data/models/note.dart';
 import 'screens/create_note_screen.dart';
 import 'bindings/app_bindings.dart';
 
@@ -13,8 +13,8 @@ void initDB() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.defaultDirectory = dir.path;
   
-  // registering vault model here
-  Hive.registerAdapter('Vault', Vault.jsonWrapper);
+  // registering note model here
+  Hive.registerAdapter('Note', Note.jsonWrapper);
 }
 
 void main() async {

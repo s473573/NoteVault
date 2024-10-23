@@ -1,41 +1,47 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:secure_note/controllers/vault_controller.dart';
 
 // design a storage solution for all of this
 // encrypt it with a vault key
 
+// TODO: refactor controller usage
 class VaultScreen extends StatelessWidget {
-  final List<String> vaults = ["Work Vault", "Personal Vault", "Ideas Vault"]; // ad-hoc vaults
+  final VaultController controller = Get.find<VaultController>();
 
   VaultScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final List<String> vaults = controller.getVaultIds();
+
     return CupertinoPageScaffold(
       child: SafeArea(
-        child: Column(
-          children: [
-            CupertinoNavigationBar(
-              leading: Text(
-                'Your Vaults',
-                style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+        child: Center(
+          child: Column(
+            children: [
+              CupertinoNavigationBar(
+                leading: Text(
+                  'Your Vaults',
+                  style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+                ),
               ),
-            ),
-            Expanded(
-              child: PageView.builder(
-                itemCount: vaults.length + 1, // don't forget the functional card!
-                controller: PageController(viewportFraction: 0.85),
-                itemBuilder: (context, index) {
-                  if (index < vaults.length) {
-                    return VaultCard(vaultName: vaults[index]);
-                  } else {
-                    return AddNewVaultCard();
-                  }
-                },
+              Expanded(
+                child: PageView.builder(
+                  itemCount: vaults.length + 1, // don't forget the functional card!
+                  controller: PageController(viewportFraction: 0.85),
+                  itemBuilder: (context, index) {
+                    if (index < vaults.length) {
+                      return VaultCard(vaultName: vaults[index]);
+                    } else {
+                      return AddNewVaultCard();
+                    }
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -91,12 +97,59 @@ class VaultCard extends StatelessWidget {
 }
 
 class AddNewVaultCard extends StatelessWidget {
+  final VaultController controller = Get.find<VaultController>();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         // should add a new very much secure vault to the db or smt
-        Get.toNamed('/create_vault');
+        // Get.toNamed('/create_vault');
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            String vaultName = '';
+            String vaultPassword = '';
+            return CupertinoAlertDialog(
+              title: Text('Create New Vault'),
+              content: Column(
+                children: [
+                  CupertinoTextField(
+                    placeholder: 'Vault Name',
+                    onChanged: (value) {
+                      vaultName = value;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  CupertinoTextField(
+                    placeholder: 'Password',
+                    obscureText: true,
+                    onChanged: (value) {
+                      vaultPassword = value;
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                CupertinoDialogAction(
+                  child: Text('Create'),
+                  onPressed: () async {
+                    if (vaultName.isNotEmpty && vaultPassword.isNotEmpty) { // input sanitization goes here
+                      controller.createVault(vaultName, vaultPassword);
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        ); 
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
