@@ -26,9 +26,20 @@ class VaultController extends GetxController {
     _box.add(id);
   }
   
-  void createVault(String name, String password) {
+  void createVault(String name, String password) async {
     _box.add(name);
-    _repo.openVaultBox(name, password);
+    var vault = await _repo.openVaultBox(name, password);
+    vault.close();
+  }
+  
+  Future<bool> unlockVault(String name, String password) async {
+    try {
+      await _repo.openVaultBox(name, password);
+      return true;
+    }
+    catch (_) {
+      return false;
+    }
   }
   
   int getLength() {

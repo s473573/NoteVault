@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:secure_note/controllers/home_controller.dart';
 
-import 'package:secure_note/data/repositories/note_repository.dart';
 import 'package:secure_note/data/models/note.dart';
+import 'package:secure_note/data/repositories/vault_repository.dart';
 
 class CreateNoteController extends GetxController {
-  final NoteRepository repo = Get.find();
+  final VaultRepository repo = Get.find();
+  final HomeController con = Get.find();
 
   Future<void> saveNote(String name, String content) async {
     try {
       // Create a new note using the NoteController
-      repo.addNote(Note(
+      repo.addNoteToVault(con.getVault(), Note(
         id: UniqueKey().toString(), // Assuming you want a unique identifier
         name: name,
         content: content,

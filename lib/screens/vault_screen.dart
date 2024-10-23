@@ -58,7 +58,45 @@ class VaultCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // User has to enter a password somewhere here
-        Get.toNamed('/vault', arguments: vaultName);
+        // Get.toNamed('/vault', arguments: vaultName);
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            String password = '';
+            return CupertinoAlertDialog(
+              title: Text('Enter Password'),
+              content: Column(
+                children: [
+                  CupertinoTextField(
+                    placeholder: 'Password',
+                    obscureText: true,
+                    onChanged: (value) {
+                      password = value;
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                CupertinoDialogAction(
+                  child: Text('Unlock'),
+                  onPressed: () async {
+                    final vaultController = Get.find<VaultController>();
+                    if (await vaultController.unlockVault(vaultName, password)) {
+                      Navigator.of(context).pop();
+                      Get.toNamed('/vault', arguments: [vaultName, password]);
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),

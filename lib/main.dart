@@ -7,6 +7,7 @@ import 'package:secure_note/screens/vault_screen.dart';
 import 'data/models/note.dart';
 import 'screens/create_note_screen.dart';
 import 'bindings/app_bindings.dart';
+import 'screens/home_screen.dart';
 
 void initDB() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,7 @@ class MainApp extends StatelessWidget {
         // GetPage(name: '/', page: () => HomeScreen()),
         GetPage(name: '/', page: () => VaultScreen()),
         GetPage(name: '/create_note', page: () => CreateNoteScreen()),
+        GetPage(name: '/vault', page: () => HomeScreen()),
       ],
       theme: const CupertinoThemeData(
         barBackgroundColor: CupertinoColors.black,
