@@ -11,12 +11,17 @@ class CreateNoteController extends GetxController {
 
   Future<void> saveNote(String name, String content) async {
     try {
-      // Create a new note using the NoteController
-      repo.addNoteToVault(con.getVault(), Note(
-        id: UniqueKey().toString(), // Assuming you want a unique identifier
+      var n = Note(
+        id: UniqueKey().toString(), // unique identifier uh-huh
         name: name,
         content: content,
-      ));
+      );
+
+      // Create a new note using the NoteController
+      repo.addNoteToVault(con.getVault(), n);
+      
+      // TODO: refactor this hack
+      con.notes.add(n);
 
       // Print a success message (you can replace this with your desired feedback mechanism)
       print('Note saved successfully');

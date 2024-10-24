@@ -14,8 +14,6 @@ class VaultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> vaults = controller.getVaultIds();
-
     return CupertinoPageScaffold(
       child: SafeArea(
         child: Center(
@@ -28,16 +26,20 @@ class VaultScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: PageView.builder(
-                  itemCount: vaults.length + 1, // don't forget the functional card!
-                  controller: PageController(viewportFraction: 0.85),
-                  itemBuilder: (context, index) {
-                    if (index < vaults.length) {
-                      return VaultCard(vaultName: vaults[index]);
-                    } else {
-                      return AddNewVaultCard();
-                    }
-                  },
+                child: Obx(() {
+                  final List<String> vaults = controller.vaultIds;
+
+                  return PageView.builder(
+                    itemCount: vaults.length + 1, // don't forget the functional card!
+                    controller: PageController(viewportFraction: 0.85),
+                    itemBuilder: (context, index) {
+                      if (index < vaults.length) {
+                        return VaultCard(vaultName: vaults[index]);
+                      } else {
+                        return AddNewVaultCard();
+                      }
+                    },
+                  );},
                 ),
               ),
             ],
@@ -141,8 +143,6 @@ class AddNewVaultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // should add a new very much secure vault to the db or smt
-        // Get.toNamed('/create_vault');
         showCupertinoDialog(
           context: context,
           builder: (context) {
