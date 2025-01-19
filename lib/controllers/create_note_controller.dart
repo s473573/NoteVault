@@ -21,7 +21,7 @@ class CreateNoteController extends GetxController {
       repo.addNoteToVault(con.getVault(), n);
       
       // TODO: refactor this hack
-      con.notes.add(n);
+      con.noteCollection.add(n);
 
       // Print a success message (you can replace this with your desired feedback mechanism)
       print('Note saved successfully');

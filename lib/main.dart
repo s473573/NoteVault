@@ -5,11 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:secure_note/screens/vault_screen.dart';
 
 import 'data/models/note.dart';
-import 'screens/create_note_screen.dart';
+import 'screens/home/create_note_screen.dart';
 import 'bindings/app_bindings.dart';
-import 'screens/home_screen.dart';
+import 'screens/home/home_screen.dart';
 
-void initDB() async {
+Future<void> initDB() async {
   WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
   Hive.defaultDirectory = dir.path;
@@ -19,7 +19,7 @@ void initDB() async {
 }
 
 void main() async {
-  initDB();
+  await initDB();
   runApp(const MainApp());
 }
 
@@ -32,8 +32,11 @@ void main() async {
 // add a note DONE
   // store it somewhere safe DONE +-
   
-// make different vaults of notes
-// secure each of them with a password
+// make different vaults of notes DONE
+// secure each of them with a password DONE
+
+// make ability to remove a vault DONE
+// make it possible for user to change the given vault password DONE
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

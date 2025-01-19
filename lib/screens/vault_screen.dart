@@ -27,14 +27,71 @@ class VaultScreen extends StatelessWidget {
               ),
               Expanded(
                 child: Obx(() {
-                  final List<String> vaults = controller.vaultIds;
+                  final List<String> vaults = controller.vaultNames;
 
                   return PageView.builder(
                     itemCount: vaults.length + 1, // don't forget the functional card!
                     controller: PageController(viewportFraction: 0.85),
                     itemBuilder: (context, index) {
                       if (index < vaults.length) {
-                        return VaultCard(vaultName: vaults[index]);
+                          final vaultName = vaults[index];
+                          var password = '';
+                          return Dismissible(
+                            key: ValueKey(vaultName),
+                            direction: DismissDirection.up,
+                            background: Container(
+                              alignment: Alignment.center,
+                              color: CupertinoColors.systemRed,
+                              child: Icon(CupertinoIcons.trash,
+                                  color: CupertinoColors.white, size: 40),
+                            ),
+                            confirmDismiss: (direction) async {
+                              return await showCupertinoDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CupertinoAlertDialog(
+                                    title: Text(
+                                        'Confirm vault destruction:'),
+                                    content: Column(
+                                      children: [
+                                        SizedBox(height: 8),
+                                        CupertinoTextField(
+                                          placeholder: 'Your password',
+                                          obscureText: true,
+                                          onChanged: (value) {
+                                            password = value;
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(
+                                              false); // Dismiss without deleting
+                                        },
+                                      ),
+                                      CupertinoDialogAction(
+                                        child: Text('Confirm'),
+                                        isDestructiveAction: true,
+                                        onPressed: () async {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            onDismissed: (direction) {
+                              final vaultController =
+                                  Get.find<VaultController>();
+                              vaultController.deleteVault(vaultName, password);
+                            },
+                            child: VaultCard(vaultName: vaultName),
+                          );
+
                       } else {
                         return AddNewVaultCard();
                       }

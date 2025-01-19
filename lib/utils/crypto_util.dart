@@ -29,4 +29,14 @@ class CryptoUtil {
     
     return key.extractBytes();
   }
+  
+  ///
+  /// A simple way to produce a hash from our key
+  ///
+  static Future<Hash> produceHash(List<int> key) async {
+    final algo = Sha256();
+    final digest = await algo.hash(key);
+
+    return digest;
+  }
 }
