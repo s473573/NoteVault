@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secure_note/controllers/vault_controller.dart';
+import 'package:secure_note/widgets/InputShaker.dart';
 
 // design a storage solution for all of this
 // encrypt it with a vault key
@@ -203,26 +204,71 @@ class AddNewVaultCard extends StatelessWidget {
         showCupertinoDialog(
           context: context,
           builder: (context) {
-            String vaultName = '';
-            String vaultPassword = '';
+            // local states
+            final vaultName = ''.obs;
+            final vaultPassword = ''.obs;
+
+            final shouldShake = false.obs;
+
             return CupertinoAlertDialog(
-              title: Text('Create New Vault'),
+              title: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text('Vault Creation'),
+              ),
               content: Column(
                 children: [
-                  CupertinoTextField(
-                    placeholder: 'Vault Name',
-                    onChanged: (value) {
-                      vaultName = value;
-                    },
-                  ),
+                  // Wrap each input field in ShakeWidget
+                  Obx(() => ShakeWidget(
+                        shouldShake: shouldShake.value,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CupertinoTextField(
+                              placeholder: 'Vault Name',
+                              onChanged: (value) => vaultName.value = value,
+                            ),
+                            if (controller.vaultNameError.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                                child: Text(
+                                  controller.vaultNameError.value,
+                                  style: TextStyle(
+                                    color: CupertinoColors.destructiveRed,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      )),
                   SizedBox(height: 16),
-                  CupertinoTextField(
-                    placeholder: 'Password',
-                    obscureText: true,
-                    onChanged: (value) {
-                      vaultPassword = value;
-                    },
-                  ),
+
+                  Obx(() => ShakeWidget(
+                        shouldShake: shouldShake.value,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CupertinoTextField(
+                              placeholder: 'Password',
+                              obscureText: true,
+                              onChanged: (value) => vaultPassword.value = value,
+                            ),
+                            if (controller.passwordError.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                                child: Text(
+                                  controller.passwordError.value,
+                                  style: TextStyle(
+                                    color: CupertinoColors.systemRed,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      )),
                 ],
               ),
               actions: [
@@ -235,16 +281,27 @@ class AddNewVaultCard extends StatelessWidget {
                 CupertinoDialogAction(
                   child: Text('Create'),
                   onPressed: () async {
-                    if (vaultName.isNotEmpty && vaultPassword.isNotEmpty) { // input sanitization goes here
-                      controller.createVault(vaultName, vaultPassword);
+                    controller.vaultNameError.value = '';
+                    controller.passwordError.value = '';
+
+                    // attempt to create with raw input
+                    final success = await controller.createVaultIfValid(
+                      vaultName.value.trim(),
+                      vaultPassword.value,
+                    );
+
+                    if (success) {
                       Navigator.of(context).pop();
+                    } else {
+                      // trigger the animation
+                      shouldShake.value = true;
                     }
                   },
                 ),
               ],
             );
           },
-        ); 
+        );
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
@@ -268,3 +325,80 @@ class AddNewVaultCard extends StatelessWidget {
     );
   }
 }
+
+
+// class AddNewVaultCard extends StatelessWidget {
+//   final VaultController controller = Get.find<VaultController>();
+// 
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         showCupertinoDialog(
+//           context: context,
+//           builder: (context) {
+//             String vaultName = '';
+//             String vaultPassword = '';
+//             return CupertinoAlertDialog(
+//               title: Text('Create New Vault'),
+//               content: Column(
+//                 children: [
+//                   CupertinoTextField(
+//                     placeholder: 'Vault Name',
+//                     onChanged: (value) {
+//                       vaultName = value;
+//                     },
+//                   ),
+//                   SizedBox(height: 16),
+//                   CupertinoTextField(
+//                     placeholder: 'Password',
+//                     obscureText: true,
+//                     onChanged: (value) {
+//                       vaultPassword = value;
+//                     },
+//                   ),
+//                 ],
+//               ),
+//               actions: [
+//                 CupertinoDialogAction(
+//                   child: Text('Cancel'),
+//                   onPressed: () {
+//                     Navigator.of(context).pop();
+//                   },
+//                 ),
+//                 CupertinoDialogAction(
+//                   child: Text('Create'),
+//                   onPressed: () async {
+//                     if (vaultName.isNotEmpty && vaultPassword.isNotEmpty) { // input sanitization goes here
+//                       controller.createVault(vaultName, vaultPassword);
+//                       Navigator.of(context).pop();
+//                     }
+//                   },
+//                 ),
+//               ],
+//             );
+//           },
+//         ); 
+//       },
+//       child: Container(
+//         margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(16),
+//           boxShadow: [
+//             BoxShadow(
+//               color: CupertinoColors.darkBackgroundGray,
+//               blurRadius: 10,
+//               offset: Offset(0, 4),
+//             ),
+//           ],
+//         ),
+//         child: Center(
+//           child: Icon(
+//             CupertinoIcons.add_circled_solid,
+//             size: 70,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

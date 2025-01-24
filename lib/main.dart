@@ -33,10 +33,20 @@ void main() async {
   // store it somewhere safe DONE +-
   
 // make different vaults of notes DONE
-// secure each of them with a password DONE
+  // secure each of them with a password DONE
+  // make ability to remove a vault DONE
+  // make it possible for user to change the given vault password DONE
 
-// make ability to remove a vault DONE
-// make it possible for user to change the given vault password DONE
+// sanitize all user input, focusing on sensitive and dangerous info like passwords
+  // maybe sanitize vault names too (no spaces or anything weird like that!)
+
+// TODO:
+// implement face-id entry
+  // provide a choice between good-old symbols and city-sleek face-id
+
+// TODO:
+// extend information stored about a vault to a json-serialized object,
+// with metadata fields about a vault instance
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

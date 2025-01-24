@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:get/get.dart';
 import 'package:secure_note/data/repositories/vault_repository.dart';
 import 'package:secure_note/utils/format.dart';
+import 'package:secure_note/utils/vault_input_validation.dart';
 
 // UI-related logic
 class VaultController extends GetxController {
@@ -14,6 +15,10 @@ class VaultController extends GetxController {
   var vaultNames = <String>[].obs;
   late final StreamSubscription<void> _vaultBoxSubscription; 
   void _fetchVaults () => vaultNames.value = _repo.getAllVaults();
+  
+  RxString vaultNameError = ''.obs;     // empty if no error
+  RxString passwordError = ''.obs;      // empty if no error
+
 
   @override
   void onInit() {
@@ -32,27 +37,41 @@ class VaultController extends GetxController {
     _vaultBoxSubscription.cancel();
     super.onClose();
   }
+
+  ///
+  /// Accesses vault input validator, produces no error if input is accepted
+  ///
+  String? validateVaultName(String name) {
+    final error = VaultInputValidator.validateVaultName(name);
+    vaultNameError.value = error ?? '';
+    return error;
+  }
+  String? validatePassword(String pass) {
+    final error = VaultInputValidator.validatePassword(pass);
+    passwordError.value = error ?? '';
+    return error;
+  }
   
-  
-  // void _fetchVaultIds() {
-  //   print("Stored vault names: $_nameBook");
-  //   nameList.value = (_nameBook.length == 0) ?
-  //     List.empty(growable: true) : _nameBook.getRange(0, _nameBook.length);
-  // }
-  
-  // // TODO: refactor
-  // List<String> getVaultIds() {
-  //   if (_box.length == 0) return List.empty();
-  //   return _box.getRange(0, _box.length);
-  // }
-  
+  Future<bool> createVaultIfValid(String vaultName, String vaultPassword) async {
+    final nameError = validateVaultName(vaultName);
+    final passError = validatePassword(vaultPassword);
+
+    if (nameError != null || passError != null) {
+      // UI receives False on error!
+      return false;
+    }
+
+    // If valid, proceed
+    _createVault(vaultName, vaultPassword);
+    return true;
+  }
   
   ///
   /// Starts to keep track of the name of the vault,
   /// constructs an id and uses it to
   /// write one on disk and encrypt if new.
   ///
-  void createVault(String name, String password) async {
+  void _createVault(String name, String password) async {
     _repo.addVaultName(name);
     print("Keeping track of vault named $name !");
 
