@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:secure_note/controllers/home_controller.dart';
 import 'package:secure_note/data/models/note.dart';
+import 'package:secure_note/screens/home/create_note_screen.dart';
 import 'package:secure_note/widgets/dialogs/dialog_utils.dart';
 
 import 'statistics_view.dart';
@@ -41,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text(controller.name.value),
+        middle: Text(controller.name.value.toUpperCase()),
       ),
       child: FutureBuilder<void>(
         future: _initVaultFuture,
@@ -100,79 +101,100 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNoteGrid() {
     return SafeArea(
-      child: Column(
-        children: [
-          CupertinoNavigationBar(
-            leading: Text(
-              'My Secure Notes',
-              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
-            ),
-            trailing: GestureDetector(
-              onTap: () {
-                controller.toggleStatistics();
-                print("Circle Avatar was clicked!");
-              },
-              child: CircleAvatar(
-                radius: 15,
-                backgroundImage: AssetImage('assets/images/no-image-yet.png'),
-              ),
-            ),
-            border: Border(
-              bottom: BorderSide(width: 0.0, color: Colors.transparent),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CupertinoSearchTextField(
-              onChanged: (value) {
-                // TODO: Implement search functionality
-              },
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Obx(() {
-                return GridView.builder(
-                  itemCount: controller.noteCollection.length,
-                  // Grid configuration
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Max two columns
-                    crossAxisSpacing: 16.0,
-                    mainAxisSpacing: 16.0,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemBuilder: (context, index) {
-                    final Note note = controller.noteCollection[index];
-                    return NoteCardWidget(note: note);
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    controller.toggleStatistics();
+                    print("Circle Avatar was clicked!");
                   },
-                );
-              }),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: MediaQuery.of(context).size.width / 2 - 35,
-            child: Container(
-              height: 70,
-              width: 70,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(35),
-                color: CupertinoColors.darkBackgroundGray,
-              ),
-              child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: Icon(
-                  CupertinoIcons.add,
-                  size: 35,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundImage: AssetImage('assets/images/no-image-yet.png'),
+                  ),
                 ),
-                onPressed: () {
-                  Get.toNamed('/create_note');
-                },
+                // CupertinoNavigationBar(
+                //   leading: Text(
+                //     'My Secure Notes',
+                //     style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+                //   ),
+                //   trailing: GestureDetector(
+                //     onTap: () {
+                //       controller.toggleStatistics();
+                //       print("Circle Avatar was clicked!");
+                //     },
+                //     child: CircleAvatar(
+                //       radius: 15,
+                //       backgroundImage: AssetImage('assets/images/no-image-yet.png'),
+                //     ),
+                //   ),
+                //   border: Border(
+                //     bottom: BorderSide(width: 0.0, color: Colors.transparent),
+                //   ),
+                // ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CupertinoSearchTextField(
+                    onChanged: (value) {
+                      // TODO: Implement search functionality
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Obx(() {
+                      return GridView.builder(
+                        itemCount: controller.noteCollection.length,
+                        // Grid configuration
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Max two columns
+                          crossAxisSpacing: 16.0,
+                          mainAxisSpacing: 16.0,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemBuilder: (context, index) {
+                          final Note note = controller.noteCollection[index];
+                          return NoteCardWidget(note: note);
+                        },
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              bottom: 20,
+              left: MediaQuery.of(context).size.width / 2 - 35,
+              child: Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(35),
+                  color: CupertinoColors.darkBackgroundGray,
+                ),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: Icon(
+                    CupertinoIcons.add,
+                    size: 35,
+                  ),
+                  onPressed: () async {
+                    return Get.to(
+                      () => CreateNoteScreen(),
+                      fullscreenDialog: true
+                    );
+                    //Get.toNamed('/create_note');
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

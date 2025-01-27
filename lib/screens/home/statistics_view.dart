@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:secure_note/controllers/home_controller.dart';
+import 'package:secure_note/utils/vault_input_validation.dart';
+import 'package:secure_note/widgets/InputShaker.dart';
 import 'package:secure_note/widgets/dialogs/dialog_utils.dart';
 
 ///
@@ -16,10 +18,11 @@ class StatisticsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
+    var shouldShake = false.obs;
 
     return Container(
       // color: CupertinoColors.systemGrey6,
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,47 +54,62 @@ class StatisticsView extends StatelessWidget {
           Column(
             children: [
               CupertinoButton.filled(
-  alignment: Alignment.centerLeft,
-  onPressed: () {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String oldPassword = '';
-        String newPassword = '';
-        String confirmPassword = '';
+                onPressed: () {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      String oldPassword = '';
+                      String newPassword = '';
+                      String confirmPassword = '';
 
-        return CupertinoAlertDialog(
-          title: Text('Change Vault Key'),
-          content: Column(
-            children: [
-              SizedBox(height: 8),
-              CupertinoTextField(
-                placeholder: 'Old Password',
-                obscureText: true,
-                onChanged: (value) {
-                  oldPassword = value;
-                },
-              ),
-              SizedBox(height: 16),
-              CupertinoTextField(
-                placeholder: 'New Password',
-                obscureText: true,
-                onChanged: (value) {
-                  newPassword = value;
-                },
-              ),
-              SizedBox(height: 16),
-              CupertinoTextField(
-                placeholder: 'Confirm New Password',
-                obscureText: true,
-                onChanged: (value) {
-                  confirmPassword = value;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            CupertinoDialogAction(
+                      return CupertinoAlertDialog(
+                        title: Text('Change Vault Key'),
+                        content: (Obx(() => ShakeWidget(
+                              shouldShake: shouldShake.value,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 8),
+                                  CupertinoTextField(
+                                    placeholder: 'Old Password',
+                                    obscureText: true,
+                                    onChanged: (value) {
+                                      oldPassword = value;
+                                    },
+                                  ),
+                                  SizedBox(height: 16),
+                                  CupertinoTextField(
+                                    placeholder: 'New Password',
+                                    obscureText: true,
+                                    onChanged: (value) {
+                                      newPassword = value;
+                                    },
+                                  ),
+                                  SizedBox(height: 16),
+                                  CupertinoTextField(
+                                    placeholder: 'Confirm New Password',
+                                    obscureText: true,
+                                    onChanged: (value) {
+                                      confirmPassword = value;
+                                    },
+                                  ),
+                                  if (controller.passwordError.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 4.0, bottom: 8.0),
+                                      child: Text(
+                                        controller.passwordError.value,
+                                        style: TextStyle(
+                                          color: CupertinoColors.destructiveRed,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ))),
+                        actions: [
+                          CupertinoDialogAction(
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog without changes
@@ -105,6 +123,10 @@ class StatisticsView extends StatelessWidget {
                   showErrorDialog(context, 'Passwords do not match!');
                   return;
                 }
+                
+                final error = VaultInputValidator.validatePassword(newPassword);
+                if (error != null)
+                { controller.passwordError.value = error; shouldShake.value = true; return; }
 
                 try {
                   await controller.changePassword(
@@ -123,7 +145,13 @@ class StatisticsView extends StatelessWidget {
       },
     );
   },
-  child: Text('Change Vault Key', textAlign: TextAlign.left),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      Text('Relock ', style: TextStyle(fontWeight: FontWeight.bold),),
+      Icon(CupertinoIcons.lock_circle)
+    ],
+  ),
 ),
               SizedBox(height: 16),
               CupertinoButton.filled(
@@ -161,9 +189,15 @@ class StatisticsView extends StatelessWidget {
                     },
                   );
                 },
-                child: Text(
-                  'Destroy Vault',
-                  maxLines: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Destroy',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Icon(CupertinoIcons.delete_solid)
+                  ],
                 ),
               ),
             ],

@@ -10,6 +10,7 @@ class HomeController extends GetxController {
   final VaultFormatter formatter = VaultFormatter();
   late Box<Note> _vault;
   Rx<String> name = 'Invalid Vault'.obs;
+  Rx<String> passwordError = ''.obs;
 
   RxList<Note> noteCollection = <Note>[].obs;
 
@@ -88,7 +89,9 @@ class HomeController extends GetxController {
       }
       relockedVault.close();
     } catch (err) {
-      print("Error changing the password: $err");
+      final String errorMessage = "Error changing the password: $err";
+      print(errorMessage);
+      passwordError.value = errorMessage;
     } finally {
       // init again
       await initVault(this.name.value, newPassword);

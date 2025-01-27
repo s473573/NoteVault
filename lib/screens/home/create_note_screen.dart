@@ -11,7 +11,7 @@ class CreateNoteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CreateNoteController _createController = Get.find();
+    final CreateNoteController createController = Get.find();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -20,7 +20,7 @@ class CreateNoteScreen extends StatelessWidget {
           child: CupertinoButton(
             padding: const EdgeInsets.all(8.0),
             onPressed: () {
-              _createController.saveNote(
+              createController.saveNote(
                   nameController.text,
                   contentController.text
                 );

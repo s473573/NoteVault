@@ -106,6 +106,8 @@ class VaultCryptoService {
   /// Checks whether theres Vault Master Key set.
   ///
   Future<bool> isMasterKeySet() async {
-    return secureStorage.containsKey(key: MASTERPASS_KEY);
+    final isSet = await secureStorage.containsKey(key: MASTERPASS_KEY);
+    if (!isSet) { print("Master password is not set."); }
+    return isSet;
   }
 }
