@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:secure_note/data/models/note.dart';
 import 'package:secure_note/utils/crypto_util.dart';
 import 'package:secure_note/utils/format.dart';
+import 'package:secure_note/utils/vault_crypto_service.dart';
 
 // Vaults are maximum 5mb in size! Should be enough for our layman purposes.
 
@@ -15,8 +16,11 @@ class VaultRepository {
   static const String VAULT_BOX_NAME = "vault-names";
   final Box<String> _vaultNameBox = Hive.box<String>(name: VAULT_BOX_NAME);
 
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final VaultFormatter formatter = VaultFormatter();
+  // final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final vaultCrypto = VaultCryptoService(
+    secureStorage: const FlutterSecureStorage(),
+    formatter: VaultFormatter()
+  );
   
   List<String> getAllVaults() {
     final vaults = (_vaultNameBox.length == 0) ?
@@ -47,7 +51,7 @@ class VaultRepository {
   ///
   Future<Box<Note>> openVaultBox(String vaultId, String password) async {
     // deriving a key using PBKDF2
-    var key = await _generateEncryptionKey(vaultId, password); // this could overwrite wrong salt!
+    var key = await vaultCrypto.deriveVaultKey(vaultId, password); // this could overwrite wrong salt!
     return Hive.box<Note>(name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
   }
 
@@ -67,9 +71,7 @@ class VaultRepository {
   /// retaining the ability to authenticate
   ///
   Future<void> createVault(String vaultId, String password) async {
-    await _initializeSalt(vaultId); // writing a new salt
-    var key = await _generateEncryptionKey(vaultId, password);
-    await _storeVaultKeyHash(vaultId, key); // and a new hash
+    var key = await vaultCrypto.initializeVaultKey(vaultId, password);
     try {
       Hive.box<Note>(name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
     } catch (err) {
@@ -81,18 +83,8 @@ class VaultRepository {
   /// Sanity check: if im validating a password for a thing,
   /// that thing already exists
   ///
-  Future<bool> validateVaultPassword(String vaultId, String inputPassword) async {
-    final derivedKey = await _generateEncryptionKey(vaultId, inputPassword);
-    final derivedDigest = await CryptoUtil.produceHash(derivedKey);
-    final derivedHash = base64Encode(derivedDigest.bytes);
-    print("Derived hash for password ($inputPassword): $derivedHash");
-    
-    final storedHash = await _readVaultKeyHash(vaultId);
-    print("Stored hash : $storedHash");
-
-    // Compare!
-    return (derivedHash == storedHash);
-  }
+  Future<bool> validateVaultPassword(String vaultId, String inputPassword) => 
+    vaultCrypto.validateVaultHash(vaultId, inputPassword);
 
   
   // This method should return a Vault object, which is essentially a wrapper
@@ -135,8 +127,8 @@ class VaultRepository {
     vaultBox.deleteFromDisk();
     
     print("Wiping salt and hash values...");
-    await _wipeSalt(vid);
-    await _wipeVaultKeyHash(vid);
+    await vaultCrypto.wipeSalt(vid);
+    await vaultCrypto.wipeVaultKeyHash(vid);
   }
   
   ///
@@ -160,59 +152,59 @@ class VaultRepository {
   /// This should make a tiny performance improvement,
   /// since the derivation itself is constly and made often
   ///
-  Future<void> _storeVaultKeyHash(String vid, List<int> key) async {
-    // Deriving the key
-    // final keyBytes = await _generateEncryptionKey(vid, pass);  // returns List<int>
-    final digest = await CryptoUtil.produceHash(key);
-    final hashString = base64Encode(digest.bytes);
+  // Future<void> _storeVaultKeyHash(String vid, List<int> key) async {
+  //   // Deriving the key
+  //   // final keyBytes = await _generateEncryptionKey(vid, pass);  // returns List<int>
+  //   final digest = await CryptoUtil.produceHash(key);
+  //   final hashString = base64Encode(digest.bytes);
 
-    // Storing the hash in secure storage, under a certain format
-    await _secureStorage.write(key: formatter.hash(vid), value: hashString);
-  }
-  Future<String> _readVaultKeyHash(String vid) async {
-    final storedHash = await _secureStorage.read(key: formatter.hash(vid));
-    if (storedHash == null) {
-      throw StateError('No stored key hash found for vault: $vid');
-    }
-    return storedHash;
-  }
-  Future<void> _wipeVaultKeyHash(String vid) async {
-    _secureStorage.delete(key: formatter.hash(vid));
-  }
-  
-  ///
-  /// Reads a salt and if not present (that means its a new vault),
-  /// initializes a new salt
-  ///
-  Future<List<int>> _produceVaultSalt(String vid) async {
-    final saltString = await _secureStorage.read(key: formatter.salt(vid));
-    if (saltString == null) { print("No salt for vault ID: $vid"); }
-    return saltString != null ? base64Decode(saltString) : await _initializeSalt(vid);
-  }
-  Future<List<int>> _initializeSalt(String vid) async {
-    print("Initializing a salt for vault ID: $vid");
+  //   // Storing the hash in secure storage, under a certain format
+  //   await _secureStorage.write(key: formatter.hash(vid), value: hashString);
+  // }
+  // Future<String> _readVaultKeyHash(String vid) async {
+  //   final storedHash = await _secureStorage.read(key: formatter.hash(vid));
+  //   if (storedHash == null) {
+  //     throw StateError('No stored key hash found for vault: $vid');
+  //   }
+  //   return storedHash;
+  // }
+  // Future<void> _wipeVaultKeyHash(String vid) async {
+  //   _secureStorage.delete(key: formatter.hash(vid));
+  // }
+  // 
+  // ///
+  // /// Reads a salt and if not present (that means its a new vault),
+  // /// initializes a new salt
+  // ///
+  // Future<List<int>> _produceVaultSalt(String vid) async {
+  //   final saltString = await _secureStorage.read(key: formatter.salt(vid));
+  //   if (saltString == null) { print("No salt for vault ID: $vid"); }
+  //   return saltString != null ? base64Decode(saltString) : await _initializeSalt(vid);
+  // }
+  // Future<List<int>> _initializeSalt(String vid) async {
+  //   print("Initializing a salt for vault ID: $vid");
 
-    final salt = CryptoUtil.produceSalt();
-    final saltString = base64Encode(salt);
-    await _secureStorage.write(key: formatter.salt(vid), value: saltString);
-    return salt;
-  }
-  Future<void> _wipeSalt(String vid) async {
-    _secureStorage.delete(key: formatter.salt(vid));
-  }
+  //   final salt = CryptoUtil.produceSalt();
+  //   final saltString = base64Encode(salt);
+  //   await _secureStorage.write(key: formatter.salt(vid), value: saltString);
+  //   return salt;
+  // }
+  // Future<void> _wipeSalt(String vid) async {
+  //   _secureStorage.delete(key: formatter.salt(vid));
+  // }
 
-  ///
-  /// Derives a key for this vault using a dedicated salt,
-  /// if no salt is present, generates it too
-  ///
-  Future<List<int>> _generateEncryptionKey(String vid, String pass) async {
-    final vaultSalt = await _produceVaultSalt(vid);
+  // ///
+  // /// Derives a key for this vault using a dedicated salt,
+  // /// if no salt is present, generates it too
+  // ///
+  // Future<List<int>> _generateEncryptionKey(String vid, String pass) async {
+  //   final vaultSalt = await _produceVaultSalt(vid);
 
-    final keyBytes = await CryptoUtil.deriveKey(pass, vaultSalt);
-    print('Derived key: ${base64.encode(keyBytes)}');
+  //   final keyBytes = await CryptoUtil.deriveKey(pass, vaultSalt);
+  //   print('Derived key: ${base64.encode(keyBytes)}');
 
-    return keyBytes;
-  }
+  //   return keyBytes;
+  // }
 }
 
 class PasswordValidationException implements Exception {

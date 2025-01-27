@@ -25,6 +25,16 @@ class VaultScreen extends StatelessWidget {
                   'Your Vaults',
                   style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
                 ),
+                  trailing: CupertinoButton(
+    padding: EdgeInsets.zero,
+                  child: const Icon(
+                    CupertinoIcons.home,
+                    size: 28,
+                  ),
+                  onPressed: () {
+                    Get.offNamed('/');
+                  },
+                ),
               ),
               Expanded(
                 child: Obx(() {

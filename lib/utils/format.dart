@@ -2,6 +2,7 @@ class VaultFormatter {
   final String namespace;
   final String vaultType;
 
+  // currently supporting two vaultTypes: standard and masterkey
   VaultFormatter({this.namespace = 'notevault', this.vaultType = 'standard'});
 
   ///

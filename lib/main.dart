@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:secure_note/screens/login_screen.dart';
 import 'package:secure_note/screens/vault_screen.dart';
 
 import 'data/models/note.dart';
@@ -38,7 +39,7 @@ void main() async {
   // make it possible for user to change the given vault password DONE
 
 // sanitize all user input, focusing on sensitive and dangerous info like passwords
-  // maybe sanitize vault names too (no spaces or anything weird like that!)
+  // maybe sanitize vault names too (no spaces or anything weird like that!) DONE
 
 // TODO:
 // implement face-id entry
@@ -61,7 +62,9 @@ class MainApp extends StatelessWidget {
       initialRoute: '/',
       getPages: [
         // GetPage(name: '/', page: () => HomeScreen()),
-        GetPage(name: '/', page: () => VaultScreen()),
+        //GetPage(name: '/', page: () => VaultScreen()),
+        GetPage(name: '/', page: () => LoginScreen()),
+        GetPage(name: '/vault-collection', page: () => VaultScreen()),
         GetPage(name: '/create_note', page: () => CreateNoteScreen()),
         GetPage(name: '/vault', page: () => HomeScreen()),
       ],

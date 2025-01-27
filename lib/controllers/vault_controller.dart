@@ -19,7 +19,6 @@ class VaultController extends GetxController {
   RxString vaultNameError = ''.obs;     // empty if no error
   RxString passwordError = ''.obs;      // empty if no error
 
-
   @override
   void onInit() {
     super.onInit();
