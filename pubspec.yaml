@@ -13,7 +13,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   get: ^4.6.5
   hive: ^2.2.3
-  isar_flutter_libs: ^4.0.0-dev.13
+  # isar_flutter_libs: ^4.0.0-dev.13
   path_provider: ^2.1.0 
   cryptography: ^2.0.0
 
