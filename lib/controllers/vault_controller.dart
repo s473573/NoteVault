@@ -13,11 +13,11 @@ class VaultController extends GetxController {
   final VaultFormatter formatter = VaultFormatter();
 
   var vaultNames = <String>[].obs;
-  late final StreamSubscription<void> _vaultBoxSubscription; 
-  void _fetchVaults () => vaultNames.value = _repo.getAllVaults();
-  
-  RxString vaultNameError = ''.obs;     // empty if no error
-  RxString passwordError = ''.obs;      // empty if no error
+  late final StreamSubscription<void> _vaultBoxSubscription;
+  void _fetchVaults() => vaultNames.value = _repo.getAllVaults();
+
+  RxString vaultNameError = ''.obs; // empty if no error
+  RxString passwordError = ''.obs; // empty if no error
 
   @override
   void onInit() {
@@ -28,8 +28,9 @@ class VaultController extends GetxController {
     // keeping track of box changes
     _vaultBoxSubscription = _repo.watchVaults().listen((event) {
       _fetchVaults();
-     });
+    });
   }
+
   @override
   void onClose() {
     // Cancel the subscription when the controller is disposed
@@ -45,13 +46,15 @@ class VaultController extends GetxController {
     vaultNameError.value = error ?? '';
     return error;
   }
+
   String? validatePassword(String pass) {
     final error = VaultInputValidator.validatePassword(pass);
     passwordError.value = error ?? '';
     return error;
   }
-  
-  Future<bool> createVaultIfValid(String vaultName, String vaultPassword) async {
+
+  Future<bool> createVaultIfValid(
+      String vaultName, String vaultPassword) async {
     final nameError = validateVaultName(vaultName);
     final passError = validatePassword(vaultPassword);
 
@@ -64,7 +67,7 @@ class VaultController extends GetxController {
     _createVault(vaultName, vaultPassword);
     return true;
   }
-  
+
   ///
   /// Starts to keep track of the name of the vault,
   /// constructs an id and uses it to
@@ -95,7 +98,7 @@ class VaultController extends GetxController {
     _repo.removeVaultName(name);
     print("Successfully forgot the $name name!");
   }
-  
+
   ///
   /// Checks if it can open a vault with a given password.
   /// Warning: this effectively conceals the inner-debug error messages,
@@ -105,7 +108,8 @@ class VaultController extends GetxController {
     // TODO: should I include a check if theres a vault with a given name?
     final vid = formatter.constructVaultId(name);
     print("Validating password: $password for vault $vid...");
-    return _repo.validateVaultPassword(vid, password)
+    return _repo
+        .validateVaultPassword(vid, password)
         .then((_) => true)
         .catchError((_) => false);
   }

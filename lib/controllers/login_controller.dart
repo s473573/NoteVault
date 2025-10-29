@@ -12,14 +12,12 @@ class LoginController extends GetxController {
   var password = ''.obs;
   RxString passwordError = ''.obs;
   // var shakeOffset = 0.0.obs;
-  
+
   final _localAuth = LocalAuthentication();
   final vaultCrypto = VaultCryptoService(
-    secureStorage: const FlutterSecureStorage(),
-    formatter: VaultFormatter(
-      namespace: 'notevault',
-      vaultType: 'masterkey')
-  );
+      secureStorage: const FlutterSecureStorage(),
+      formatter:
+          VaultFormatter(namespace: 'notevault', vaultType: 'masterkey'));
 
   @override
   void onInit() async {
@@ -28,21 +26,20 @@ class LoginController extends GetxController {
     // deciding whether the user set the password
     isMasterPasswordSet.value = await vaultCrypto.isMasterKeySet();
   }
-  
+
   // validate input and proceed picking your vault!
   Future<void> handleSubmit() async {
     final bool isValid = await validateMasterPassword(password.value);
-    if (!isValid) { return; }
+    if (!isValid) {
+      return;
+    }
 
     if (isMasterPasswordSet.value) {
-      if (
-        await vaultCrypto.validateVaultHash(
-          VaultCryptoService.MASTERPASS_KEY,
-          password.value
-      ))
-      Get.offNamed('/vault-collection');
+      if (await vaultCrypto.validateVaultHash(
+          VaultCryptoService.MASTERPASS_KEY, password.value))
+        Get.offNamed('/vault-collection');
       else
-      passwordError.value = "Wrong password.";
+        passwordError.value = "Wrong password.";
     } else {
       _setMasterPassword(password.value);
       Get.offNamed('/vault-collection');
@@ -58,11 +55,12 @@ class LoginController extends GetxController {
   }
 
   void _setMasterPassword(String newPassword) async {
-    vaultCrypto.initializeVaultKey(VaultCryptoService.MASTERPASS_KEY, newPassword);
+    vaultCrypto.initializeVaultKey(
+        VaultCryptoService.MASTERPASS_KEY, newPassword);
 
     isMasterPasswordSet.value = true;
   }
-  
+
   /// Face ID
   Future<void> authenticateWithFaceID() async {
     // check if supported
@@ -92,7 +90,7 @@ class LoginController extends GetxController {
       if (e.code == auth_error.notEnrolled) {
         passwordError.value = 'Face ID is not enrolled on this device.';
       } else if (e.code == auth_error.lockedOut ||
-                 e.code == auth_error.permanentlyLockedOut) {
+          e.code == auth_error.permanentlyLockedOut) {
         passwordError.value = 'Too many attempts. Face ID is locked.';
       } else {
         passwordError.value = 'Face ID error: $e';

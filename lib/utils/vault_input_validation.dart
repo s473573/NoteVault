@@ -13,7 +13,7 @@ class VaultInputValidator {
     return null;
   }
 
-  // Min length 4. 
+  // Min length 4.
   static String? validatePassword(String password) {
     if (password.isEmpty) {
       return 'Password is required.';

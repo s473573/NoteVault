@@ -15,18 +15,20 @@ class VaultCryptoService {
   });
 
   static const String MASTERPASS_KEY = 'master-pass';
-  
+
   Future<List<int>> initializeVaultKey(String vaultId, String pass) async {
     await _initializeSalt(vaultId); // writing a new salt
     var key = await _generateEncryptionKey(vaultId, pass);
     await storeVaultKeyHash(vaultId, key); // and a new hash
-    
+
     return key;
   }
+
   Future<List<int>> deriveVaultKey(String vaultId, String pass) async {
-    return await _generateEncryptionKey(vaultId, pass); // this could overwrite wrong salt!
+    return await _generateEncryptionKey(
+        vaultId, pass); // this could overwrite wrong salt!
   }
-  
+
   ///
   /// Sanity check: if im validating a password for a thing,
   /// that thing already exists
@@ -36,7 +38,7 @@ class VaultCryptoService {
     final derivedDigest = await CryptoUtil.produceHash(derivedKey);
     final derivedHash = base64Encode(derivedDigest.bytes);
     print("Derived hash for password ($pass): $derivedHash");
-    
+
     final storedHash = await readVaultKeyHash(vaultId);
     print("Stored hash : $storedHash");
 
@@ -57,6 +59,7 @@ class VaultCryptoService {
     // Storing the hash in secure storage, under a certain format
     await secureStorage.write(key: formatter.hash(vid), value: hashString);
   }
+
   Future<String> readVaultKeyHash(String vid) async {
     final storedHash = await secureStorage.read(key: formatter.hash(vid));
     if (storedHash == null) {
@@ -64,19 +67,25 @@ class VaultCryptoService {
     }
     return storedHash;
   }
+
   Future<void> wipeVaultKeyHash(String vid) async {
     secureStorage.delete(key: formatter.hash(vid));
   }
-  
+
   ///
   /// Reads a salt and if not present (that means its a new vault),
   /// initializes a new salt
   ///
   Future<List<int>> _produceVaultSalt(String vid) async {
     final saltString = await secureStorage.read(key: formatter.salt(vid));
-    if (saltString == null) { print("No salt for vault ID: $vid"); }
-    return saltString != null ? base64Decode(saltString) : await _initializeSalt(vid);
+    if (saltString == null) {
+      print("No salt for vault ID: $vid");
+    }
+    return saltString != null
+        ? base64Decode(saltString)
+        : await _initializeSalt(vid);
   }
+
   Future<List<int>> _initializeSalt(String vid) async {
     print("Initializing a salt for vault ID: $vid");
 
@@ -85,6 +94,7 @@ class VaultCryptoService {
     await secureStorage.write(key: formatter.salt(vid), value: saltString);
     return salt;
   }
+
   Future<void> wipeSalt(String vid) async {
     secureStorage.delete(key: formatter.salt(vid));
   }
@@ -101,13 +111,15 @@ class VaultCryptoService {
 
     return keyBytes;
   }
-  
+
   ///
   /// Checks whether theres Vault Master Key set.
   ///
   Future<bool> isMasterKeySet() async {
     final isSet = await secureStorage.containsKey(key: MASTERPASS_KEY);
-    if (!isSet) { print("Master password is not set."); }
+    if (!isSet) {
+      print("Master password is not set.");
+    }
     return isSet;
   }
 }

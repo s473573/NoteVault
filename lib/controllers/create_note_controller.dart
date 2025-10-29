@@ -19,7 +19,7 @@ class CreateNoteController extends GetxController {
 
       // Create a new note using the NoteController
       repo.addNoteToVault(con.getVault(), n);
-      
+
       // TODO: refactor this hack
       con.noteCollection.add(n);
 

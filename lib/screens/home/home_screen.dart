@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   final HomeController controller = Get.find();
   late Future<void> _initVaultFuture;
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: CupertinoActivityIndicator(radius: 20.0),
     );
   }
+
   Widget _buildErrorView() {
     // Possibly show a scaffold with a minimal UI or a background
     // to avoid “empty screen” confusion
@@ -85,12 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _buildMainContent(String vaultName) {
     return Stack(
       children: [
         // Normal content
         _buildNoteGrid(),
-    
+
         // Dim background (overlay)
         _buildDimmedOverlay(),
         // Slide in overlay
@@ -114,7 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: CircleAvatar(
                     radius: 15,
-                    backgroundImage: AssetImage('assets/images/no-image-yet.png'),
+                    backgroundImage:
+                        AssetImage('assets/images/no-image-yet.png'),
                   ),
                 ),
                 // CupertinoNavigationBar(
@@ -184,10 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     size: 35,
                   ),
                   onPressed: () async {
-                    return Get.to(
-                      () => CreateNoteScreen(),
-                      fullscreenDialog: true
-                    );
+                    return Get.to(() => CreateNoteScreen(),
+                        fullscreenDialog: true);
                     //Get.toNamed('/create_note');
                   },
                 ),
@@ -198,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _buildDimmedOverlay() {
     return Obx(() {
       return controller.isStatisticsVisible.value
@@ -210,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : SizedBox.shrink();
     });
   }
+
   Widget _buildStatisticsOverlay(String vaultName) {
     return Obx(() {
       final screenWidth = MediaQuery.of(context).size.width;

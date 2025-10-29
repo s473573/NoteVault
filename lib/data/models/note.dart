@@ -24,7 +24,7 @@ class Note {
       'content': content,
     };
   }
-  
+
   // hive library really complains without this
   static Note jsonWrapper(dynamic json) {
     return Note.fromJson(json as Map<String, dynamic>);

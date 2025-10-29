@@ -25,8 +25,8 @@ class VaultScreen extends StatelessWidget {
                   'Your Vaults',
                   style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
                 ),
-                  trailing: CupertinoButton(
-    padding: EdgeInsets.zero,
+                trailing: CupertinoButton(
+                  padding: EdgeInsets.zero,
                   child: const Icon(
                     CupertinoIcons.home,
                     size: 28,
@@ -37,14 +37,16 @@ class VaultScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Obx(() {
-                  final List<String> vaults = controller.vaultNames;
+                child: Obx(
+                  () {
+                    final List<String> vaults = controller.vaultNames;
 
-                  return PageView.builder(
-                    itemCount: vaults.length + 1, // don't forget the functional card!
-                    controller: PageController(viewportFraction: 0.85),
-                    itemBuilder: (context, index) {
-                      if (index < vaults.length) {
+                    return PageView.builder(
+                      itemCount: vaults.length +
+                          1, // don't forget the functional card!
+                      controller: PageController(viewportFraction: 0.85),
+                      itemBuilder: (context, index) {
+                        if (index < vaults.length) {
                           final vaultName = vaults[index];
                           var password = '';
                           return Dismissible(
@@ -61,8 +63,7 @@ class VaultScreen extends StatelessWidget {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return CupertinoAlertDialog(
-                                    title: Text(
-                                        'Confirm vault destruction:'),
+                                    title: Text('Confirm vault destruction:'),
                                     content: Column(
                                       children: [
                                         SizedBox(height: 8),
@@ -102,12 +103,12 @@ class VaultScreen extends StatelessWidget {
                             },
                             child: VaultCard(vaultName: vaultName),
                           );
-
-                      } else {
-                        return AddNewVaultCard();
-                      }
-                    },
-                  );},
+                        } else {
+                          return AddNewVaultCard();
+                        }
+                      },
+                    );
+                  },
                 ),
               ),
             ],
@@ -157,7 +158,8 @@ class VaultCard extends StatelessWidget {
                   child: Text('Unlock'),
                   onPressed: () async {
                     final vaultController = Get.find<VaultController>();
-                    if (await vaultController.unlockVault(vaultName, password)) {
+                    if (await vaultController.unlockVault(
+                        vaultName, password)) {
                       Navigator.of(context).pop();
                       Get.toNamed('/vault', arguments: [vaultName, password]);
                     }
@@ -239,8 +241,8 @@ class AddNewVaultCard extends StatelessWidget {
                             ),
                             if (controller.vaultNameError.isNotEmpty)
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                                padding: const EdgeInsets.only(
+                                    top: 4.0, bottom: 8.0),
                                 child: Text(
                                   controller.vaultNameError.value,
                                   style: TextStyle(
@@ -266,8 +268,8 @@ class AddNewVaultCard extends StatelessWidget {
                             ),
                             if (controller.passwordError.isNotEmpty)
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                                padding: const EdgeInsets.only(
+                                    top: 4.0, bottom: 8.0),
                                 child: Text(
                                   controller.passwordError.value,
                                   style: TextStyle(
@@ -336,10 +338,9 @@ class AddNewVaultCard extends StatelessWidget {
   }
 }
 
-
 // class AddNewVaultCard extends StatelessWidget {
 //   final VaultController controller = Get.find<VaultController>();
-// 
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     return GestureDetector(
@@ -388,7 +389,7 @@ class AddNewVaultCard extends StatelessWidget {
 //               ],
 //             );
 //           },
-//         ); 
+//         );
 //       },
 //       child: Container(
 //         margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),

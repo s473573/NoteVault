@@ -9,7 +9,6 @@ import 'package:secure_note/utils/vault_crypto_service.dart';
 
 // Vaults are maximum 5mb in size! Should be enough for our layman purposes.
 
-
 // I bind a vault for operations
 // CRUD operations go here:
 class VaultRepository {
@@ -18,17 +17,17 @@ class VaultRepository {
 
   // final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final vaultCrypto = VaultCryptoService(
-    secureStorage: const FlutterSecureStorage(),
-    formatter: VaultFormatter()
-  );
-  
+      secureStorage: const FlutterSecureStorage(), formatter: VaultFormatter());
+
   List<String> getAllVaults() {
-    final vaults = (_vaultNameBox.length == 0) ?
-      List<String>.empty(growable: true) : _vaultNameBox.getRange(0, _vaultNameBox.length);
+    final vaults = (_vaultNameBox.length == 0)
+        ? List<String>.empty(growable: true)
+        : _vaultNameBox.getRange(0, _vaultNameBox.length);
     print("Stored vault names: $vaults");
 
     return vaults;
   }
+
   ///
   /// Remembers this vaults name,
   /// will rewrite existing data!
@@ -38,11 +37,13 @@ class VaultRepository {
     _vaultNameBox.put(name, name);
     print("Vaults after addition: ${getAllVaults()}");
   }
+
   void removeVaultName(String name) {
     print("Vaults before removal: ${getAllVaults()}");
     _vaultNameBox.delete(name);
     print("Vaults after removal: ${getAllVaults()}");
   }
+
   Stream<void> watchVaults() => _vaultNameBox.watch();
 
   // opening a box with an unmatched name will create a new one!
@@ -51,8 +52,10 @@ class VaultRepository {
   ///
   Future<Box<Note>> openVaultBox(String vaultId, String password) async {
     // deriving a key using PBKDF2
-    var key = await vaultCrypto.deriveVaultKey(vaultId, password); // this could overwrite wrong salt!
-    return Hive.box<Note>(name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
+    var key = await vaultCrypto.deriveVaultKey(
+        vaultId, password); // this could overwrite wrong salt!
+    return Hive.box<Note>(
+        name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
   }
 
   Future<Box<Note>> openVault(String vaultId, String password) async {
@@ -61,10 +64,11 @@ class VaultRepository {
     if (isValid) {
       return await openVaultBox(vaultId, password);
     } else {
-      throw PasswordValidationException('Invalid password for vault ID: $vaultId');
+      throw PasswordValidationException(
+          'Invalid password for vault ID: $vaultId');
     }
   }
-  
+
   ///
   /// Creating a vault involves generating an encryption key,
   /// building and securing a box (a formatted id is passed) to hold notes in,
@@ -73,20 +77,20 @@ class VaultRepository {
   Future<void> createVault(String vaultId, String password) async {
     var key = await vaultCrypto.initializeVaultKey(vaultId, password);
     try {
-      Hive.box<Note>(name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
+      Hive.box<Note>(
+          name: vaultId, encryptionKey: base64.encode(key), maxSizeMiB: 5);
     } catch (err) {
       print("Hive box error: $err");
     }
   }
-  
+
   ///
   /// Sanity check: if im validating a password for a thing,
   /// that thing already exists
   ///
-  Future<bool> validateVaultPassword(String vaultId, String inputPassword) => 
-    vaultCrypto.validateVaultHash(vaultId, inputPassword);
+  Future<bool> validateVaultPassword(String vaultId, String inputPassword) =>
+      vaultCrypto.validateVaultHash(vaultId, inputPassword);
 
-  
   // This method should return a Vault object, which is essentially a wrapper
   // for the boxed content (notes) + metadata
   // Future<Vault> openVault(String name, String password) {
@@ -114,6 +118,7 @@ class VaultRepository {
   Future<void> lockVaultBox(Box<Note> vaultBox) async {
     vaultBox.close();
   }
+
   ///
   /// Consumes and wipes the box,
   /// cleans key hash,
@@ -125,12 +130,12 @@ class VaultRepository {
 
     vaultBox.clear();
     vaultBox.deleteFromDisk();
-    
+
     print("Wiping salt and hash values...");
     await vaultCrypto.wipeSalt(vid);
     await vaultCrypto.wipeVaultKeyHash(vid);
   }
-  
+
   ///
   /// This shouldnt do any front end stuff like checking passwords
   /// doing less thing with more security awareness
@@ -171,7 +176,7 @@ class VaultRepository {
   // Future<void> _wipeVaultKeyHash(String vid) async {
   //   _secureStorage.delete(key: formatter.hash(vid));
   // }
-  // 
+  //
   // ///
   // /// Reads a salt and if not present (that means its a new vault),
   // /// initializes a new salt

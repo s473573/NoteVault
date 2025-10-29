@@ -5,7 +5,7 @@ import 'package:cryptography/cryptography.dart';
 class CryptoUtil {
   static const int SALT_LENGTH = 16;
   static const int KEY_LENGTH = 32; // 32 bytes (256 bits)
-  
+
   // generates a semi-secure random byte seq
   static List<int> produceSalt() {
     final random = Random.secure();
@@ -26,10 +26,10 @@ class CryptoUtil {
       password: password,
       nonce: salt,
     );
-    
+
     return key.extractBytes();
   }
-  
+
   ///
   /// A simple way to produce a hash from our key
   ///

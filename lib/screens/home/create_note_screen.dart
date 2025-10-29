@@ -21,9 +21,7 @@ class CreateNoteScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             onPressed: () {
               createController.saveNote(
-                  nameController.text,
-                  contentController.text
-                );
+                  nameController.text, contentController.text);
               Get.back();
             },
             child: Icon(
@@ -40,7 +38,7 @@ class CreateNoteScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: CupertinoTextField(
                   textAlign: TextAlign.center,
                   controller: nameController,
@@ -62,7 +60,8 @@ class CreateNoteScreen extends StatelessWidget {
                   placeholder: 'Type your note here...',
                   padding: EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: CupertinoTheme.of(context).primaryColor),
+                    border: Border.all(
+                        color: CupertinoTheme.of(context).primaryColor),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   keyboardType: TextInputType.multiline,
@@ -71,7 +70,9 @@ class CreateNoteScreen extends StatelessWidget {
                   textAlign: TextAlign.start,
                 ),
               ),
-              const SizedBox(height: 16.0,)
+              const SizedBox(
+                height: 16.0,
+              )
             ],
           ),
         ),

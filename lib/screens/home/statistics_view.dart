@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:secure_note/controllers/home_controller.dart';
@@ -110,49 +109,60 @@ class StatisticsView extends StatelessWidget {
                             ))),
                         actions: [
                           CupertinoDialogAction(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog without changes
-              },
-            ),
-            CupertinoDialogAction(
-              child: Text('Change'),
-              isDefaultAction: true,
-              onPressed: () async {
-                if (newPassword != confirmPassword) {
-                  showErrorDialog(context, 'Passwords do not match!');
-                  return;
-                }
-                
-                final error = VaultInputValidator.validatePassword(newPassword);
-                if (error != null)
-                { controller.passwordError.value = error; shouldShake.value = true; return; }
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close dialog without changes
+                            },
+                          ),
+                          CupertinoDialogAction(
+                            child: Text('Change'),
+                            isDefaultAction: true,
+                            onPressed: () async {
+                              if (newPassword != confirmPassword) {
+                                showErrorDialog(
+                                    context, 'Passwords do not match!');
+                                return;
+                              }
 
-                try {
-                  await controller.changePassword(
-                    oldPassword,
-                    newPassword,
+                              final error =
+                                  VaultInputValidator.validatePassword(
+                                      newPassword);
+                              if (error != null) {
+                                controller.passwordError.value = error;
+                                shouldShake.value = true;
+                                return;
+                              }
+
+                              try {
+                                await controller.changePassword(
+                                  oldPassword,
+                                  newPassword,
+                                );
+                                showSuccessDialog(context,
+                                        'Password successfully changed!')
+                                    .then((_) => Get.offAllNamed('/'));
+                              } catch (e) {
+                                showErrorDialog(context, e.toString());
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
-                  showSuccessDialog(context, 'Password successfully changed!')
-                      .then((_) => Get.offAllNamed('/'));
-                } catch (e) {
-                  showErrorDialog(context, e.toString());
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  },
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: [
-      Text('Relock ', style: TextStyle(fontWeight: FontWeight.bold),),
-      Icon(CupertinoIcons.lock_circle)
-    ],
-  ),
-),
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Relock ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Icon(CupertinoIcons.lock_circle)
+                  ],
+                ),
+              ),
               SizedBox(height: 16),
               CupertinoButton.filled(
                 alignment: Alignment.centerLeft,

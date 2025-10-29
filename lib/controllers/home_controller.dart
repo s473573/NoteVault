@@ -46,15 +46,15 @@ class HomeController extends GetxController {
   /// generates an ID from name, for authentication and later password validation
   ///
   Future<void> _bindVault(String name, String password) async {
-    this._vault = await vault_api.openVault(formatter.constructVaultId(name), password);
+    this._vault =
+        await vault_api.openVault(formatter.constructVaultId(name), password);
   }
 
-
-  /// 
+  ///
   /// Checks if the key is correct and,
   /// in that case opens the associated vault, its boxed content
   /// and loads it to memory
-  /// 
+  ///
   Future<void> initVault(String name, String password) async {
     print("Initializing vault: $name");
     try {
@@ -79,7 +79,7 @@ class HomeController extends GetxController {
 
   /// an animation for refreshed vault? like notes are restacked
   Future<void> changePassword(String oldPassword, String newPassword) async {
-    try{
+    try {
       // check if the password is correct
       // call check password method
       var relockedVault = await vault_api.relockVault(_vault, newPassword);

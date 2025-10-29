@@ -13,7 +13,7 @@ class Vault {
   final String name;
   final DateTime creationDate;
   final Box<Note> box;
-  
+
   // Something like that
   // factory Vault.createNew(String name, String password ... ) {
   //   return Vault(

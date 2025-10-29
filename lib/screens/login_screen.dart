@@ -26,48 +26,48 @@ class LoginScreen extends StatelessWidget {
 
               // Password Input Section
               Obx(() => ShakeWidget(
-                  shouldShake: shouldShake.value,
-                  child: Column(
-                    children: [
-                      CupertinoTextField(
-                        textAlign: TextAlign.center,
-                        obscureText: true,
-                        placeholder: controller.isMasterPasswordSet.value
-                            ? 'Provide your master password'
-                            : 'Initialize your master password',
-                        // placeholderStyle: TextStyle(
-                        //   color: CupertinoColors.systemGrey,
-                        // ),
-                        // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                        // decoration: BoxDecoration(
-                        //   color: CupertinoColors.white,
-                        //   borderRadius: BorderRadius.circular(30),
-                        //   boxShadow: [
-                        //     BoxShadow(
-                        //       color: CupertinoColors.systemGrey2,
-                        //       blurRadius: 10,
-                        //       offset: Offset(0, 4),
-                        //     ),
-                        //   ],
-                        // ),
-                        onChanged: (value) =>
-                          controller.password.value = value
-                        ,
-                      ),
-                      if (controller.passwordError.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
-                          child: Text(
-                            controller.passwordError.value,
-                            style: TextStyle(
-                              color: CupertinoColors.destructiveRed,
-                              fontSize: 12,
+                    shouldShake: shouldShake.value,
+                    child: Column(
+                      children: [
+                        CupertinoTextField(
+                          textAlign: TextAlign.center,
+                          obscureText: true,
+                          placeholder: controller.isMasterPasswordSet.value
+                              ? 'Provide your master password'
+                              : 'Initialize your master password',
+                          // placeholderStyle: TextStyle(
+                          //   color: CupertinoColors.systemGrey,
+                          // ),
+                          // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          // decoration: BoxDecoration(
+                          //   color: CupertinoColors.white,
+                          //   borderRadius: BorderRadius.circular(30),
+                          //   boxShadow: [
+                          //     BoxShadow(
+                          //       color: CupertinoColors.systemGrey2,
+                          //       blurRadius: 10,
+                          //       offset: Offset(0, 4),
+                          //     ),
+                          //   ],
+                          // ),
+                          onChanged: (value) =>
+                              controller.password.value = value,
+                        ),
+                        if (controller.passwordError.isNotEmpty)
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                            child: Text(
+                              controller.passwordError.value,
+                              style: TextStyle(
+                                color: CupertinoColors.destructiveRed,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                )),
+                      ],
+                    ),
+                  )),
 
               SizedBox(height: 10),
 
@@ -104,8 +104,9 @@ class LoginScreen extends StatelessWidget {
                   onPressed: () {
                     shouldShake.value = false;
                     controller.handleSubmit();
-                    if (controller.passwordError.value.isNotEmpty)
-                    { shouldShake.value = true; }
+                    if (controller.passwordError.value.isNotEmpty) {
+                      shouldShake.value = true;
+                    }
                   },
                 ),
               ),
@@ -164,11 +165,12 @@ class _AnimatedTitleState extends State<_AnimatedTitle>
           offset: Offset(0, _animation.value * 5), // simple flow animation
           child: Text(
             'NoteVault',
-            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Serif', // some serif font goes here
-            ),
+            style:
+                CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Serif', // some serif font goes here
+                    ),
           ),
         ),
       ],
