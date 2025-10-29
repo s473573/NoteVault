@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ "**/*.md" ]
+  pull_request:
+    branches: [ main ]
+    paths-ignore: [ "**/*.md" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter (3.7.x for Dart 2.19)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.7.12"
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Tests
+        run: flutter test
